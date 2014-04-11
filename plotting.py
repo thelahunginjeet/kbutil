@@ -1,5 +1,6 @@
 import pylab
-from numpy import ceil,log2,histogram,min,max,abs,linspace
+from numpy import ceil,log2,histogram,min,max,abs,linspace,zeros
+from numpy.random import randn
 from scipy.stats import gaussian_kde
 
 def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsize=18,usetex=True):
@@ -34,7 +35,9 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     pylab.rc("font",size=18)
 
 
-def pylab_hist_plus_kde(x,barcolor='k',linecolor='r',nbins=None):
+# fix the next one to take an existing axis object to build on top
+
+def plot_hist_plus_kde(x,barcolor='k',linecolor='r',nbins=None):
     """
     Plots a histogram (bar plot) with an overlaid kernel density estimate of the distribution.
     Returns the barplot for further manipulation (label modification, limits, etc.)
@@ -42,9 +45,12 @@ def pylab_hist_plus_kde(x,barcolor='k',linecolor='r',nbins=None):
     Parameters:
     -------------
     x         : input data (numpy array or list)
-    barcolor  : color for barplot
-    linecolor : kernel estimate color
-    nbins     : number of histogram bins; if nbins=None, nbins defaults to 1 + ceil(log2(len(x)))
+    barcolor  : string, optional
+                color for barplot
+    linecolor : string, optional
+                color for KDE
+    nbins     : integer, optional
+                if nbins not provided (= None), defaults to 1 + ceil(log2(len(x)))
     """
     if nbins is None:
         nbins = 1 + ceil(log2(len(x)))
@@ -74,6 +80,55 @@ def pylab_hist_plus_kde(x,barcolor='k',linecolor='r',nbins=None):
     ax.get_yaxis().set_visible(False)
     ax.set_xlim([lpoint,rpoint])
     ax.set_ylim([-0.01,1.15*max(dens)])
+
+    return ax
+
+
+
+def plot_points_plus_kde(x,markx=False,lines=3,size=9,color='k',ax=None):
+    """
+    Plots a one-dimensional densty for x, as points on a line with a KDE on top.
+
+    Parameters:
+    -------------
+    x     : array-like
+            data to produce density plot for
+    markx : bool, optional
+            put tick labels at the min/max values in x?
+    lines : integer, optional
+            line/marker edge thickness
+    size  : integer, optional
+            marker size
+    color : string, optional
+            color for points and kde
+    ax    : matplotlib axes object, optional
+            can put multiple plots on the same graph
+    """
+    if ax is None:
+        ax = pylab.gca(frameon=False)
+
+    # make the point plot
+    ax.plot(x,zeros(x.shape),color+'o',markersize=size,mew=lines)
+
+    # kde
+    kde = gaussian_kde(x)
+    lpoint = min(x) - 0.025*abs(min(x))
+    rpoint = max(x) + 0.025*abs(max(x))
+    support = linspace(lpoint,rpoint,512)
+    mPDF = kde(support)
+    ax.plot(support,mPDF,color=color,lw=lines)
+
+    # pretty things up
+    # ax.set_ylim([-0.05,1.05*max(mPDF)])
+    # prtty things up
+    ax.get_yaxis().set_visible(False)
+    if markx:
+        major_formatter = pylab.FormatStrFormatter('%1.2f')
+        ax.get_xaxis().set_major_formatter(major_formatter)
+        ax.get_xaxis().tick_bottom()
+        ax.get_xaxis().set_ticks([min(x),max(x)])
+    else:
+        ax.get_xaxis().set_ticks([])
 
     return ax
 
