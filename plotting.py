@@ -4,7 +4,8 @@ from numpy.random import randn
 from scipy.stats import gaussian_kde
 
 def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsize=18,usetex=True):
-    """Changes pylab plot defaults to get nicer plots - frame size, marker size, etc.
+    """
+    Changes pylab plot defaults to get nicer plots - frame size, marker size, etc.
     
     Parameters:
     ------------    
@@ -15,7 +16,9 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     markersize : size of plotting markers
     fontsize   : size of font for labels and legend
     usetex     : use latex for labels/text?
+    
     """
+    
     pylab.rc("lines",linewidth=lines)
     pylab.rc("lines",markeredgewidth=size/3)
     pylab.rc("lines",markersize=markersize)
