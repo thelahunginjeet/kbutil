@@ -1,4 +1,4 @@
-import collections
+import collections,operator
 
 def unique(seq, idfun=repr):
     """
@@ -19,3 +19,11 @@ def flatten(l):
                 yield sub
         else:
             yield el
+
+def sort_by_value(D,reverse=False):
+    """
+    There are many ways to sort a dictionary by value and return lists/tuples/etc. 
+    This is one recommended in PEP265.
+    """
+    return sorted(D.iteritems(),key=operator.itemgetter(1),reverse=reverse)
+
