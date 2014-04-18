@@ -1,7 +1,66 @@
+"""
+@author: Kevin S. Brown, University of Connecticut
+
+This source code is provided under the BSD-3 license, duplicated as follows:
+
+Copyright (c) 2013, Kevin S. Brown
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, 
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this 
+list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this 
+list of conditions and the following disclaimer in the documentation and/or other 
+materials provided with the distribution.
+
+3. Neither the name of the University of Connecticut  nor the names of its contributors 
+may be used to endorse or promote products derived from this software without specific 
+prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""
+
 import pylab
-from numpy import ceil,log2,histogram,min,max,abs,linspace,zeros
+from numpy import ceil,log2,histogram,abs,linspace,zeros,inf
+from numpy import min as npmin
+from numpy import max as mpmax
 from numpy.random import randn
 from scipy.stats import gaussian_kde
+
+_colors = ('k','r','b','g','c','m','y')
+_symbols = ('o','s','^','<','>','x','D','h','p')
+_lines = ('-','--','-.',':')
+
+def color_wheel(colors=_colors,symbols=_symbols,lines=_lines):
+    """
+    Returns a generator that cycles through a selection of colors,symbols,
+    lines styles for matplotlib.plot.  Thanks to Ryan Gutenkunst for this
+    idiom.
+    """
+    if not colors:
+        colors = ('',)
+    if not symbols:
+        symbols = ('',)
+    if not lines:
+        lines = ('',)
+
+    while 1:
+        for l in lines:
+            for s in symbols:
+                for c in colors:
+                    yield (c,s,l)
+
+
 
 def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsize=18,usetex=True):
     """
@@ -38,63 +97,77 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     pylab.rc("font",size=18)
 
 
-# fix the next one to take an existing axis object to build on top
+# modify next one to plot multiple bar graphs/lines
 
-def plot_hist_plus_kde(x,barcolor='k',linecolor='r',nbins=None):
+def plot_hist_plus_kde(xlist,nbins=[]):
     """
-    Plots a histogram (bar plot) with an overlaid kernel density estimate of the distribution.
-    Returns the barplot for further manipulation (label modification, limits, etc.)
+    Plots a histogram (bar plot) with an overlaid kernel density estimate of the distributions
+    in xlist (a list of data arrays). Returns the axes for further manipulation (label modification, 
+    limits, etc.)  Bar/line colors match and are cycled through automatically.
     
     Parameters:
     -------------
-    x         : input data (numpy array or list)
-    barcolor  : string, optional
-                color for barplot
-    linecolor : string, optional
-                color for KDE
-    nbins     : integer, optional
-                if nbins not provided (= None), defaults to 1 + ceil(log2(len(x)))
+    xlist     : list of array-like objects
+                data to product the barplots for (all elements need not be same length!)
+    nbins     : list, optional
+                should be the same length as xlist; if empty, defaults to
+                nbins[i] = 1 + ceil(log2(len(x)))
     """
-    if nbins is None:
-        nbins = 1 + ceil(log2(len(x)))
-
+    if len(nbins) == 0:
+        for i in xrange(0,len(xlist)):
+            nbins.append(1 + ceil(log2(len(xlist[i]))))
+    
     ax = pylab.gca(frameon=False)
 
-    # make the bar plot
-    dens,bin_edges = pylab.histogram(x,bins=nbins,density=True)
-    bin_edges = bin_edges[0:-1]
-    # prevents overlapping bars
-    barwidth = 0.9*(bin_edges[1] - bin_edges[0])
-    barplot = ax.bar(bin_edges,dens,color=barcolor,width=barwidth)
+    # cycles through colors
+    cw = color_wheel(lines=('-'),symbols=('o'))
 
-    # kde on top
-    kde = gaussian_kde(x)
-    lpoint = min(x) - 0.025*abs(min(x))
-    rpoint = max(x) + 0.025*abs(max(x))
-    support = linspace(lpoint,rpoint,256)
-    mPDF = kde(support)
-    ax.plot(support,mPDF,color=linecolor,lw=4)
+    minx = inf
+    maxx = -inf
+
+    for i in xrange(0,len(xlist)):
+        
+        # spin the color wheel
+        (c,s,l) = cw.next()
+
+        # make the bar plot
+        dens,bin_edges = pylab.histogram(xlist[i],bins=nbins[i],density=True)
+        bin_edges = bin_edges[0:-1]
+        # prevents overlapping bars
+        barwidth = 0.9*(bin_edges[1] - bin_edges[0])
+        barplot = ax.bar(bin_edges,dens,color=c,width=barwidth,alpha=0.5)
+
+        # kde on top
+        kde = gaussian_kde(xlist[i])
+        lpoint = min(xlist[i]) - 0.025*abs(min(xlist[i]))
+        rpoint = max(xlist[i]) + 0.025*abs(max(xlist[i]))
+        minx = min(minx,lpoint)
+        maxx = max(maxx,rpoint)
+        support = linspace(lpoint,rpoint,256)
+        mPDF = kde(support)
+        ax.plot(support,mPDF,color=c,lw=4)
 
     # draw the x-axis
-    ax.plot([lpoint,rpoint],[0.0,0.0],color='k',lw=4)
+    ax.plot([minx,maxx],[0.0,0.0],color='k',lw=4)
 
     # pretty things up
     ax.get_xaxis().tick_bottom()
     ax.get_yaxis().set_visible(False)
-    ax.set_xlim([lpoint,rpoint])
-    ax.set_ylim([-0.01,1.15*max(dens)])
+    ax.set_xlim([minx,maxx])
+    ax.set_ylim(bottom=-0.01)
 
     return ax
 
 
 
-def plot_points_plus_kde(x,markx=False,lines=3,size=9,color='k',ax=None):
+def plot_points_plus_kde(xlist,markx=False,lines=3,size=9):
     """
-    Plots a one-dimensional densty for x, as points on a line with a KDE on top.
-
+    Accepts a list of one-dimensional densities and plots each as points on a line
+    with a KDE on top.
+    
     Parameters:
     -------------
-    x     : array-like
+    xlist : list of array-like objects
             data to produce density plot for
     markx : bool, optional
             put tick labels at the min/max values in x?
@@ -107,29 +180,36 @@ def plot_points_plus_kde(x,markx=False,lines=3,size=9,color='k',ax=None):
     ax    : matplotlib axes object, optional
             can put multiple plots on the same graph
     """
-    if ax is None:
-        ax = pylab.gca(frameon=False)
+    ax = pylab.gca(frameon=False)
+    
+    # cycles through colors
+    cw = color_wheel(lines=('-'),symbols=('o'))
 
-    # make the point plot
-    ax.plot(x,zeros(x.shape),color+'o',markersize=size,mew=lines)
+    for i in xrange(0,len(xlist)):
+        # spin the color wheel
+        (c,s,l) = cw.next()
+        
+        # make the point plot
+        ax.plot(xlist[i],zeros(xlist[i].shape),c+s,markersize=size,mew=lines,alpha=0.5)
 
-    # kde
-    kde = gaussian_kde(x)
-    lpoint = min(x) - 0.025*abs(min(x))
-    rpoint = max(x) + 0.025*abs(max(x))
-    support = linspace(lpoint,rpoint,512)
-    mPDF = kde(support)
-    ax.plot(support,mPDF,color=color,lw=lines)
+        # kde
+        kde = gaussian_kde(xlist[i])
+        lpoint = min(xlist[i]) - 0.025*abs(min(xlist[i]))
+        rpoint = max(xlist[i]) + 0.025*abs(max(xlist[i]))
+        support = linspace(lpoint,rpoint,512)
+        mPDF = kde(support)
+        ax.plot(support,mPDF,color=c,lw=lines)
 
-    # pretty things up
-    # ax.set_ylim([-0.05,1.05*max(mPDF)])
     # prtty things up
     ax.get_yaxis().set_visible(False)
+    ax.set_ylim(bottom=-0.1)
     if markx:
         major_formatter = pylab.FormatStrFormatter('%1.2f')
         ax.get_xaxis().set_major_formatter(major_formatter)
         ax.get_xaxis().tick_bottom()
-        ax.get_xaxis().set_ticks([min(x),max(x)])
+        minx = min([min(x) for x in xlist])
+        maxx = max([max(x) for x in xlist])
+        ax.get_xaxis().set_ticks([minx,maxx])
     else:
         ax.get_xaxis().set_ticks([])
 

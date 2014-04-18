@@ -23,8 +23,6 @@ setup(name='kbutil',
       url='https://github.com/thelahunginjeet/kbutil',
       packages=['kbutil'],
       package_dir = {'kbutil': ''},
-      #package_data = {'pyica' : ['tests/*.py']},
-      #cmdclass = {'test': PyTest},
       license='BSD-3',
       classifiers=[
           'License :: OSI Approved :: BSD-3 License',
