@@ -176,8 +176,6 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9):
             marker size
     color : string, optional
             color for points and kde
-    ax    : matplotlib axes object, optional
-            can put multiple plots on the same graph
     """
     ax = pylab.gca(frameon=False)
     
@@ -219,6 +217,21 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     """
     Makes a scatter plot of 2D data along with marginal densities in each coordinate, drawn
     using kernel density estimates.
+
+    Parameters:
+    -------------
+    x      : 1D array-like object
+    y      : 1D array-like object
+    sColor : string, optional
+             color for scatterplot points
+    xColor : string, optional
+             color for KDE(x)
+    yColor : string, optional
+             color for KDE(y)
+    xlim   : list, optional
+             x limits for plot; computed from x if none provided
+    ylim   : list, optional
+             y limits for plot; computed from y if None
     """
     # axis formatter
     def my_formatter(x,pos):
@@ -226,6 +239,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     # kde/limits
     kdepoints = 512
     inflation = 0.25
+    
     # compute axis limits if not provided
     if xlim is None:
         xlim = [0,0]
@@ -235,6 +249,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
         ylim = [0,0]
         ylim[0] = min(y) - inflation*abs(min(y))
         ylim[1] = max(y) + inflation*abs(max(y))
+    
     # plot and axis locations
     left, width = 0.1,0.65
     bottom,height = 0.1,0.65
@@ -243,6 +258,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     xHistCoords = [left,bottom_h,width,0.2]
     yHistCoords = [left_h,bottom,0.2,height]
     f = pylab.figure(1,figsize=(8,8))
+    
     # scatter plot
     axMain = pylab.axes(mainCoords,frameon=False)
     axMain.plot(x,y,sColor+'o',mec=sColor,alpha=0.5)
@@ -250,6 +266,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     axMain.set_ylim(ylim)
     axMain.get_xaxis().set_visible(False)
     axMain.get_yaxis().set_visible(False)
+    
     # x histogram
     axxHist = pylab.axes(xHistCoords,frameon=False)
     axxHist.get_yaxis().set_visible(False)
@@ -264,6 +281,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     axxHist.tick_params(axis='x',direction='in',top=False)
     axxHist.xaxis.set_major_formatter(FuncFormatter(my_formatter))
     axxHist.set_yticks([])
+    
     # y histogram
     axyHist = pylab.axes(yHistCoords,frameon=False)
     axyHist.get_xaxis().set_visible(False)
