@@ -36,6 +36,7 @@ from numpy import min as npmin
 from numpy import max as mpmax
 from numpy.random import randn
 from scipy.stats import gaussian_kde
+from matplotlib.ticker import FuncFormatter
 
 _colors = ('k','r','b','g','c','m','y')
 _symbols = ('o','s','^','<','>','x','D','h','p')
@@ -96,8 +97,6 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     pylab.rc("text",usetex=usetex)
     pylab.rc("font",size=18)
 
-
-# modify next one to plot multiple bar graphs/lines
 
 def plot_hist_plus_kde(xlist,nbins=[]):
     """
@@ -214,4 +213,72 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9):
         ax.get_xaxis().set_ticks([])
 
     return ax
+
+
+def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,ylim=None):
+    """
+    Makes a scatter plot of 2D data along with marginal densities in each coordinate, drawn
+    using kernel density estimates.
+    """
+    # axis formatter
+    def my_formatter(x,pos):
+        return '%2.2f'%x
+    # kde/limits
+    kdepoints = 512
+    inflation = 0.25
+    # compute axis limits if not provided
+    if xlim is None:
+        xlim = [0,0]
+        xlim[0] = min(x) - inflation*abs(min(x))
+        xlim[1] = max(x) + inflation*abs(max(x))
+    if ylim is None:
+        ylim = [0,0]
+        ylim[0] = min(y) - inflation*abs(min(y))
+        ylim[1] = max(y) + inflation*abs(max(y))
+    # plot and axis locations
+    left, width = 0.1,0.65
+    bottom,height = 0.1,0.65
+    bottom_h = left_h = left + width + 0.05
+    mainCoords = [left,bottom,width,height]
+    xHistCoords = [left,bottom_h,width,0.2]
+    yHistCoords = [left_h,bottom,0.2,height]
+    f = pylab.figure(1,figsize=(8,8))
+    # scatter plot
+    axMain = pylab.axes(mainCoords,frameon=False)
+    axMain.plot(x,y,sColor+'o',mec=sColor,alpha=0.5)
+    axMain.set_xlim(xlim)
+    axMain.set_ylim(ylim)
+    axMain.get_xaxis().set_visible(False)
+    axMain.get_yaxis().set_visible(False)
+    # x histogram
+    axxHist = pylab.axes(xHistCoords,frameon=False)
+    axxHist.get_yaxis().set_visible(False)
+    kdex = gaussian_kde(x)
+    xsupport = linspace(xlim[0],xlim[1],kdepoints)
+    mPDF = kdex(xsupport)
+    axxHist.plot(xsupport,mPDF,xColor,lw=3)
+    # add axis line, clean up
+    axxHist.plot(xlim,[0,0],'k-',lw=3)
+    axxHist.set_xlim(xlim)
+    axxHist.set_xticks(xlim)
+    axxHist.tick_params(axis='x',direction='in',top=False)
+    axxHist.xaxis.set_major_formatter(FuncFormatter(my_formatter))
+    axxHist.set_yticks([])
+    # y histogram
+    axyHist = pylab.axes(yHistCoords,frameon=False)
+    axyHist.get_xaxis().set_visible(False)
+    kdey = gaussian_kde(y)
+    ysupport = linspace(ylim[0],ylim[1],kdepoints)
+    mPDF = kdey(ysupport)
+    axyHist.plot(mPDF,ysupport,yColor,lw=3)
+    # add axis line, clean up
+    axyHist.plot([0,0],ylim,'k-',lw=3)
+    axyHist.set_ylim(ylim)
+    axyHist.set_yticks(ylim)
+    axyHist.tick_params(axis='y',direction='in',right=False)
+    axyHist.yaxis.set_major_formatter(FuncFormatter(my_formatter))
+    axyHist.set_xticks([])
+
+    return axMain
+    
 
