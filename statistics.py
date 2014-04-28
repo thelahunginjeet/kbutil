@@ -30,10 +30,27 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from numpy import arange,correlate,newaxis,dot,sort,int,floor,ceil,interp,isnan,ones
+from numpy import arange,correlate,newaxis,dot,sort,int,floor,ceil,interp,isnan,ones,asarray
 from numpy import hanning,hamming,bartlett,blackman,r_,convolve
 from numpy.random import randint
 from scipy.stats import pearsonr,spearmanr,kendalltau
+
+def spearman_footrule_distance(s,t):
+    """
+    Computes the Spearman footrule distance between two full lists of ranks:
+
+        F(s,t) = (2/|S|^2)*sum[ |s(i) - t(i)| ],
+    
+    the normalized sum over all elements in a set of the absolute difference between
+    the rank according to s and t.  As defined, 0 <= F(s,t) <= 1.
+
+    If s,t are *not* full, this function should not be used. s,t should be array-like
+    (lists are OK).
+    """
+    # check that size of intersection = size of s,t?
+    assert len(s) == len(t)
+    return (2.0/len(s)**2)*sum(abs(asarray(s) - asarray(t)))
+    
 
 def standardize(X,stype='row'):
     """
