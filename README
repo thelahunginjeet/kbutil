@@ -6,4 +6,6 @@ Assorted python utilities that I find myself repeatedly reinventing/repeating in
 -plotting.py   : making prettier or specialized plots
 -rand.py       : generating random numbers
 -statistics.py : correlation matrices, smoothing, bootstrapping correlations, z-scoring
-	
+
+
+Junk change.	
