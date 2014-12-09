@@ -32,6 +32,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from numpy.random import randint
 
+def randchoice(l):
+    """
+    Returns and element from list l chosen at random.
+    """
+    return l[randint(len(l))]
+
 def randbit(size=None):
     """
     Generates an array of shape size of random {0,1} bits.
