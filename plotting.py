@@ -16,7 +16,7 @@ list of conditions and the following disclaimer.
 list of conditions and the following disclaimer in the documentation and/or other 
 materials provided with the distribution.
 
-3. Neither the name of the University of Connecticut  nor the names of its contributors 
+3. Neither the name of the University of Connecticut nor the names of its contributors 
 may be used to endorse or promote products derived from this software without specific 
 prior written permission.
 
@@ -31,7 +31,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import pylab
-from numpy import ceil,log2,histogram,abs,linspace,zeros,inf
+from numpy import ceil,log2,histogram,abs,linspace,zeros,inf,log
 from numpy import min as npmin
 from numpy import max as mpmax
 from numpy.random import randn
@@ -96,6 +96,28 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     pylab.rc("legend",fontsize=18)
     pylab.rc("text",usetex=usetex)
     pylab.rc("font",size=18)
+
+
+def plot_hist_logy(x,nbins=[]):
+    """
+    Plots a histogram (bar plot) of the data in x, but plotting the log of the number of counts
+    rather than the raw counts.
+    """
+    if nbins is None:
+        nbins = 1 + ceil(log2(len(x)))
+    counts,bin_edges = np.histogram(x,bins=nbins)
+    bin_edges = bin_edges[0:-1]
+
+    ax = pylab.gca(frameon=False)
+
+    barwidth = 0.9*(bin_edges[1] - bin_edges[0])
+    barplot = ax.bar(bin_edges,log(counts),color='k',width=barwidth,alpha=0.5)
+
+    # pretty things up
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().set_visible(False)
+
+    return ax
 
 
 def plot_hist_plus_kde(xlist,nbins=[]):
