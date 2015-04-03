@@ -115,7 +115,6 @@ def plot_hist_logy(x,nbins=None):
 
     # pretty things up
     ax.get_xaxis().tick_bottom()
-    ax.get_yaxis().set_visible(False)
 
     return ax
 
