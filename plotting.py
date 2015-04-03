@@ -98,7 +98,7 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     pylab.rc("font",size=18)
 
 
-def plot_hist_logy(x,nbins=[]):
+def plot_hist_logy(x,nbins=None):
     """
     Plots a histogram (bar plot) of the data in x, but plotting the log of the number of counts
     rather than the raw counts.
