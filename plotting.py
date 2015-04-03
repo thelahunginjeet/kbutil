@@ -105,13 +105,13 @@ def plot_hist_logy(x,nbins=[]):
     """
     if nbins is None:
         nbins = 1 + ceil(log2(len(x)))
-    counts,bin_edges = np.histogram(x,bins=nbins)
+    counts,bin_edges = histogram(x,bins=nbins)
     bin_edges = bin_edges[0:-1]
 
     ax = pylab.gca(frameon=False)
 
     barwidth = 0.9*(bin_edges[1] - bin_edges[0])
-    barplot = ax.bar(bin_edges,log(counts),color='k',width=barwidth,alpha=0.5)
+    barplot = ax.bar(bin_edges,log(counts),color='k',width=barwidth,alpha=0.75)
 
     # pretty things up
     ax.get_xaxis().tick_bottom()
