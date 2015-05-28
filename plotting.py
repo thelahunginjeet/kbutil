@@ -98,10 +98,10 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     pylab.rc("font",size=18)
 
 
-def plot_hist_logy(x,nbins=None):
+def plot_hist(x,nbins=None,logcounts=False):
     """
-    Plots a histogram (bar plot) of the data in x, but plotting the log of the number of counts
-    rather than the raw counts.
+    Plots a histogram (bar plot) of the data in x.  Set logcounts = True to plot log(count)
+    rather than raw bin counts.
     """
     if nbins is None:
         nbins = 1 + ceil(log2(len(x)))
@@ -111,7 +111,11 @@ def plot_hist_logy(x,nbins=None):
     ax = pylab.gca(frameon=False)
 
     barwidth = 0.9*(bin_edges[1] - bin_edges[0])
-    barplot = ax.bar(bin_edges,log(counts),color='k',width=barwidth,alpha=0.75)
+    if logy:
+        z = log(counts)
+    else:
+        z = counts
+    barplot = ax.bar(bin_edges,z,color='k',width=barwidth,alpha=0.75)
 
     # pretty things up
     ax.get_xaxis().tick_bottom()
