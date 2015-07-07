@@ -6,27 +6,27 @@ This source code is provided under the BSD-3 license, duplicated as follows:
 Copyright (c) 2013, Kevin S. Brown
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, 
+Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, this 
+1. Redistributions of source code must retain the above copyright notice, this
 list of conditions and the following disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice, this 
-list of conditions and the following disclaimer in the documentation and/or other 
+2. Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or other
 materials provided with the distribution.
 
-3. Neither the name of the University of Connecticut nor the names of its contributors 
-may be used to endorse or promote products derived from this software without specific 
+3. Neither the name of the University of Connecticut nor the names of its contributors
+may be used to endorse or promote products derived from this software without specific
 prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
-OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
-AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
@@ -66,9 +66,9 @@ def color_wheel(colors=_colors,symbols=_symbols,lines=_lines):
 def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsize=18,usetex=True):
     """
     Changes pylab plot defaults to get nicer plots - frame size, marker size, etc.
-    
+
     Parameters:
-    ------------    
+    ------------
     lines      : linewidth
     width      : width of framelines and tickmarks
     size       : tick mark length
@@ -76,9 +76,9 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     markersize : size of plotting markers
     fontsize   : size of font for labels and legend
     usetex     : use latex for labels/text?
-    
+
     """
-    
+
     pylab.rc("lines",linewidth=lines)
     pylab.rc("lines",markeredgewidth=size/3)
     pylab.rc("lines",markersize=markersize)
@@ -111,7 +111,7 @@ def plot_hist(x,nbins=None,logcounts=False):
     ax = pylab.gca(frameon=False)
 
     barwidth = 0.9*(bin_edges[1] - bin_edges[0])
-    if logy:
+    if logcounts:
         z = log(counts)
     else:
         z = counts
@@ -126,9 +126,9 @@ def plot_hist(x,nbins=None,logcounts=False):
 def plot_hist_plus_kde(xlist,nbins=[]):
     """
     Plots a histogram (bar plot) with an overlaid kernel density estimate of the distributions
-    in xlist (a list of data arrays). Returns the axes for further manipulation (label modification, 
+    in xlist (a list of data arrays). Returns the axes for further manipulation (label modification,
     limits, etc.)  Bar/line colors match and are cycled through automatically.
-    
+
     Parameters:
     -------------
     xlist     : list of array-like objects
@@ -140,7 +140,7 @@ def plot_hist_plus_kde(xlist,nbins=[]):
     if len(nbins) == 0:
         for i in xrange(0,len(xlist)):
             nbins.append(1 + ceil(log2(len(xlist[i]))))
-    
+
     ax = pylab.gca(frameon=False)
 
     # cycles through colors
@@ -150,7 +150,7 @@ def plot_hist_plus_kde(xlist,nbins=[]):
     maxx = -inf
 
     for i in xrange(0,len(xlist)):
-        
+
         # spin the color wheel
         (c,s,l) = cw.next()
 
@@ -188,7 +188,7 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9):
     """
     Accepts a list of one-dimensional densities and plots each as points on a line
     with a KDE on top.
-    
+
     Parameters:
     -------------
     xlist : list of array-like objects
@@ -203,14 +203,14 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9):
             color for points and kde
     """
     ax = pylab.gca(frameon=False)
-    
+
     # cycles through colors
     cw = color_wheel(lines=('-'),symbols=('o'))
 
     for i in xrange(0,len(xlist)):
         # spin the color wheel
         (c,s,l) = cw.next()
-        
+
         # make the point plot
         ax.plot(xlist[i],zeros(xlist[i].shape),c+s,markersize=size,mew=lines,alpha=0.5)
 
@@ -264,7 +264,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     # kde/limits
     kdepoints = 512
     inflation = 0.25
-    
+
     # compute axis limits if not provided
     if xlim is None:
         xlim = [0,0]
@@ -274,7 +274,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
         ylim = [0,0]
         ylim[0] = min(y) - inflation*abs(min(y))
         ylim[1] = max(y) + inflation*abs(max(y))
-    
+
     # plot and axis locations
     left, width = 0.1,0.65
     bottom,height = 0.1,0.65
@@ -283,7 +283,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     xHistCoords = [left,bottom_h,width,0.2]
     yHistCoords = [left_h,bottom,0.2,height]
     f = pylab.figure(1,figsize=(8,8))
-    
+
     # scatter plot
     axMain = pylab.axes(mainCoords,frameon=False)
     axMain.plot(x,y,sColor+'o',mec=sColor,alpha=0.5)
@@ -291,7 +291,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     axMain.set_ylim(ylim)
     axMain.get_xaxis().set_visible(False)
     axMain.get_yaxis().set_visible(False)
-    
+
     # x histogram
     axxHist = pylab.axes(xHistCoords,frameon=False)
     axxHist.get_yaxis().set_visible(False)
@@ -306,7 +306,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     axxHist.tick_params(axis='x',direction='in',top=False)
     axxHist.xaxis.set_major_formatter(FuncFormatter(my_formatter))
     axxHist.set_yticks([])
-    
+
     # y histogram
     axyHist = pylab.axes(yHistCoords,frameon=False)
     axyHist.get_xaxis().set_visible(False)
@@ -323,5 +323,3 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
     axyHist.set_xticks([])
 
     return axMain
-    
-
