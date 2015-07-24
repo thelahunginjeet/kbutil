@@ -31,7 +31,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import pylab
-from numpy import ceil,log2,histogram,abs,linspace,zeros,inf,log
+from numpy import ceil,log2,histogram,abs,linspace,zeros,inf,log,vstack
 from numpy import min as npmin
 from numpy import max as mpmax
 from numpy.random import randn
@@ -96,6 +96,31 @@ def pylab_pretty_plot(lines=10,width=4,size=8,labelsize=20,markersize=10,fontsiz
     pylab.rc("legend",fontsize=18)
     pylab.rc("text",usetex=usetex)
     pylab.rc("font",size=18)
+
+def plot_pylab_colormaps():
+    """
+    Makes a plot of all the pylab colormaps; useful for picking colormaps.
+    Returns a figure to either save or show.
+    """
+    # get list of colormaps
+    cmap_list = pylab.cm._cmapnames
+    nrows = len(cmap_list)
+    # set up a massive array of subplots
+    gradient = vstack((linspace(0,1,256),linspace(0,1,256)))
+    fig,axes = pylab.subplots(nrows=nrows)
+    fig.subplots_adjust(top=0.95,bottom=0.01,left=0.2,right=0.99,wspace=1.0)
+    # fill in the subplots
+    for ax,name in zip(axes,cmap_list):
+        ax.imshow(gradient,aspect='auto',cmap=getattr(pylab.cm,name))
+        pos = list(ax.get_position().bounds)
+        x_text = pos[0] - 0.01
+        y_text = pos[1] + pos[3]/2
+        fig.text(x_text,y_text,name,va='center',ha='right',fontsize=8)
+    # turn off all the ticks on all the axes
+    for ax in axes:
+        ax.set_axis_off()
+    # return the figure
+    return fig
 
 
 def plot_hist(x,nbins=None,logcounts=False):
