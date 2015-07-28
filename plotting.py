@@ -134,7 +134,7 @@ def plot_hist(x,nbins=None,logcounts=False,ax=None):
     bin_edges = bin_edges[0:-1]
 
     if ax is None:
-        ax = pylab.gca(frameon=False)
+        ax = pylab.axes(frameon=False)
 
     barwidth = 0.9*(bin_edges[1] - bin_edges[0])
     if logcounts:
@@ -170,7 +170,7 @@ def plot_hist_plus_kde(xlist,nbins=[],ax=None):
             nbins.append(1 + ceil(log2(len(xlist[i]))))
 
     if ax is None:
-        ax = pylab.gca(frameon=False)
+        ax = pylab.axes(frameon=False)
 
     # cycles through colors
     cw = color_wheel(lines=('-'),symbols=('o'))
@@ -233,7 +233,7 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9,ax=None):
     ax    : pylab axes object, optional
     """
     if ax is None:
-        ax = pylab.gca(frameon=False)
+        ax = pylab.axes(frameon=False)
 
     # cycles through colors
     cw = color_wheel(lines=('-'),symbols=('o'))
