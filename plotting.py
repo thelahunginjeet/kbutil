@@ -123,17 +123,18 @@ def plot_pylab_colormaps():
     return fig
 
 
-def plot_hist(x,nbins=None,logcounts=False):
+def plot_hist(x,nbins=None,logcounts=False,ax=None):
     """
     Plots a histogram (bar plot) of the data in x.  Set logcounts = True to plot log(count)
-    rather than raw bin counts.
+    rather than raw bin counts.  Passing in a pylab axes object is optional.
     """
     if nbins is None:
         nbins = 1 + ceil(log2(len(x)))
     counts,bin_edges = histogram(x,bins=nbins)
     bin_edges = bin_edges[0:-1]
 
-    ax = pylab.gca(frameon=False)
+    if ax is None:
+        ax = pylab.gca(frameon=False)
 
     barwidth = 0.9*(bin_edges[1] - bin_edges[0])
     if logcounts:
@@ -148,7 +149,7 @@ def plot_hist(x,nbins=None,logcounts=False):
     return ax
 
 
-def plot_hist_plus_kde(xlist,nbins=[]):
+def plot_hist_plus_kde(xlist,nbins=[],ax=None):
     """
     Plots a histogram (bar plot) with an overlaid kernel density estimate of the distributions
     in xlist (a list of data arrays). Returns the axes for further manipulation (label modification,
@@ -161,12 +162,15 @@ def plot_hist_plus_kde(xlist,nbins=[]):
     nbins     : list, optional
                 should be the same length as xlist; if empty, defaults to
                 nbins[i] = 1 + ceil(log2(len(x)))
+    ax        : pylab axes object, optional
+                use to pass in a custom set of axes
     """
     if len(nbins) == 0:
         for i in xrange(0,len(xlist)):
             nbins.append(1 + ceil(log2(len(xlist[i]))))
 
-    ax = pylab.gca(frameon=False)
+    if ax is None:
+        ax = pylab.gca(frameon=False)
 
     # cycles through colors
     cw = color_wheel(lines=('-'),symbols=('o'))
@@ -209,7 +213,7 @@ def plot_hist_plus_kde(xlist,nbins=[]):
 
 
 
-def plot_points_plus_kde(xlist,markx=False,lines=3,size=9):
+def plot_points_plus_kde(xlist,markx=False,lines=3,size=9,ax=None):
     """
     Accepts a list of one-dimensional densities and plots each as points on a line
     with a KDE on top.
@@ -226,8 +230,10 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9):
             marker size
     color : string, optional
             color for points and kde
+    ax    : pylab axes object, optional
     """
-    ax = pylab.gca(frameon=False)
+    if ax is None:
+        ax = pylab.gca(frameon=False)
 
     # cycles through colors
     cw = color_wheel(lines=('-'),symbols=('o'))
