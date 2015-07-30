@@ -123,94 +123,54 @@ def plot_pylab_colormaps():
     return fig
 
 
-def plot_hist(x,nbins=None,logcounts=False,ax=None):
+def plot_hist(x,nbins=None,kde=False,color='k',ax=None):
     """
-    Plots a histogram (bar plot) of the data in x.  Set logcounts = True to plot log(count)
-    rather than raw bin counts.  Passing in a pylab axes object is optional.
-    """
-    if nbins is None:
-        nbins = 1 + ceil(log2(len(x)))
-    counts,bin_edges = histogram(x,bins=nbins)
-    bin_edges = bin_edges[0:-1]
-
-    if ax is None:
-        ax = pylab.axes(frameon=False)
-
-    barwidth = 0.9*(bin_edges[1] - bin_edges[0])
-    if logcounts:
-        z = log(counts)
-    else:
-        z = counts
-    barplot = ax.bar(bin_edges,z,color='k',width=barwidth,alpha=0.75)
-
-    # pretty things up
-    ax.get_xaxis().tick_bottom()
-
-    return ax
-
-
-def plot_hist_plus_kde(xlist,nbins=[],ax=None):
-    """
-    Plots a histogram (bar plot) with an overlaid kernel density estimate of the distributions
-    in xlist (a list of data arrays). Returns the axes for further manipulation (label modification,
-    limits, etc.)  Bar/line colors match and are cycled through automatically.
+    Plots a histogram (bar plot) of the data in x, with an optional kernel
+    density estimate added.  Returns the axes object.
 
     Parameters:
     -------------
-    xlist     : list of array-like objects
-                data to product the barplots for (all elements need not be same length!)
-    nbins     : list, optional
-                should be the same length as xlist; if empty, defaults to
-                nbins[i] = 1 + ceil(log2(len(x)))
+    x         : array-like, required
+                    data to plot
+    nbins     : integer, optional
+                    if None, defaults to 1 + ceil(log2(len(x)))
+    kde       : boolean, optional
+                    set to True to overlay a kernel density estimate of x
+    color     : string, optional
+                    color for the bars and optional kde
     ax        : pylab axes object, optional
-                use to pass in a custom set of axes
+                    use to pass in a custom set of axes
     """
-    if len(nbins) == 0:
-        for i in xrange(0,len(xlist)):
-            nbins.append(1 + ceil(log2(len(xlist[i]))))
+    if nbins is None:
+        nbins = 1 + ceil(log2(len(x)))
 
     if ax is None:
         ax = pylab.axes(frameon=False)
 
-    # cycles through colors
-    cw = color_wheel(lines=('-'),symbols=('o'))
+    # compute bin counts
+    counts,bin_edges = histogram(x,bins=nbins,density=True)
+    bin_edges = bin_edges[0:-1]
+    barwidth = 0.9*(bin_edges[1] - bin_edges[0])
 
-    minx = inf
-    maxx = -inf
+    # bar plot
+    ax.bar(bin_edges,counts,color=color,width=barwidth,alpha=0.5)
+    lpoint = min(x) - 0.025*abs(min(x))
+    rpoint = max(x) - 0.025*abs(max(x))
 
-    for i in xrange(0,len(xlist)):
-
-        # spin the color wheel
-        (c,s,l) = cw.next()
-
-        # make the bar plot
-        dens,bin_edges = pylab.histogram(xlist[i],bins=nbins[i],density=True)
-        bin_edges = bin_edges[0:-1]
-        # prevents overlapping bars
-        barwidth = 0.9*(bin_edges[1] - bin_edges[0])
-        barplot = ax.bar(bin_edges,dens,color=c,width=barwidth,alpha=0.5)
-
-        # kde on top
-        kde = gaussian_kde(xlist[i])
-        lpoint = min(xlist[i]) - 0.025*abs(min(xlist[i]))
-        rpoint = max(xlist[i]) + 0.025*abs(max(xlist[i]))
-        minx = min(minx,lpoint)
-        maxx = max(maxx,rpoint)
+    # kde if desired
+    if kde is True:
+        kde = gaussian_kde(x)
         support = linspace(lpoint,rpoint,256)
         mPDF = kde(support)
-        ax.plot(support,mPDF,color=c,lw=4)
-
-    # draw the x-axis
-    ax.plot([minx,maxx],[0.0,0.0],color='k',lw=4)
+        ax.plot(support,mPDF,color=color,lw=3)
 
     # pretty things up
     ax.get_xaxis().tick_bottom()
     ax.get_yaxis().set_visible(False)
-    ax.set_xlim([minx,maxx])
+    ax.set_xlim([lpoint,rpoint])
     ax.set_ylim(bottom=-0.01)
 
     return ax
-
 
 
 def plot_points_plus_kde(xlist,markx=False,lines=3,size=9,ax=None):
