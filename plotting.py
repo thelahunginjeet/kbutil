@@ -37,8 +37,13 @@ from numpy import max as mpmax
 from numpy.random import randn
 from scipy.stats import gaussian_kde
 from matplotlib.ticker import FuncFormatter
+from matplotlib import colors
 
-_colors = ('k','r','b','g','c','m','y')
+_colors = colors.cnames.keys()
+# colors to drop (do not render well on a white background)
+for x in ('whitesmoke','white','snow','linen','antiquewhite','oldlace','cornsilk','lightyellow','aliceblue','ghostwhite'):
+    _colors.remove(x)
+_colors = tuple(_colors)
 _symbols = ('o','s','^','<','>','x','D','h','p')
 _lines = ('-','--','-.',':')
 
