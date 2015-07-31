@@ -34,14 +34,20 @@ import pylab
 from numpy import ceil,log2,histogram,abs,linspace,zeros,inf,log,vstack
 from numpy import min as npmin
 from numpy import max as mpmax
-from numpy.random import randn
+from numpy.random import randn,permutation
 from scipy.stats import gaussian_kde
 from matplotlib.ticker import FuncFormatter
 from matplotlib import colors
 
-_colors = ('k','r','orange','gold','g','b','purple','magenta',
-           'firebrick','coral','yellow','limegreen','dodgerblue','indigo','orchid',
-           'tomato','darkorange','greenyellow','darkgreen','deepskyblue','indigo','deeppink')
+_colors = colors.cnames.keys()
+# muted colors to drop (do not render well on a white background)
+colors_to_drop = ('whitesmoke','white','snow','linen','antiquewhite','oldlace','cornsilk',
+                    'lightyellow','aliceblue','ghostwhite','seashell','mistyrose','peachpuff','lavender',
+                    'lavenderblush','lightcyan','mintcream','floralwhite','blanchedalmond','bisque')
+for x in colors_to_drop:
+    _colors.remove(x)
+# randomize
+_colors = tuple(permutation(_colors))
 _symbols = ('o','s','^','<','>','x','D','h','p')
 _lines = ('-','--','-.',':')
 
