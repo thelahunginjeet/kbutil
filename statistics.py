@@ -30,7 +30,7 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from numpy import arange,correlate,newaxis,dot,sort,int,floor,
+from numpy import arange,correlate,newaxis,dot,sort,int,floor
 from numpy import ceil,interp,isnan,ones,asarray,argsort
 from numpy import hanning,hamming,bartlett,blackman,r_,convolve
 from numpy.random import randint
