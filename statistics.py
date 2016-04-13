@@ -31,7 +31,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from numpy import arange,correlate,newaxis,dot,sort,int,floor
-from numpy import ceil,interp,isnan,ones,asarray,argsort
+from numpy import ceil,interp,isnan,ones,asarray,argsort,zeros,linspace
 from numpy import hanning,hamming,bartlett,blackman,r_,convolve
 from numpy.random import randint
 from scipy.stats import pearsonr,spearmanr,kendalltau
@@ -242,3 +242,34 @@ def discrete_frequency_calculator(intList):
     # sorting
     indx = argsort(freq.keys())
     return asarray([freq.keys()[x] for x in indx]),asarray([freq.values()[x] for x in indx])
+
+
+def cumulative_distribution(data,range,npts=1024):
+    '''
+    Computes the (empirical) cumulative distribution F(x) of samples in data, over
+    a specified range and number of support points. F(x) is defined as:
+
+                F(x) = int_a^b p(x) dx
+
+    or as a sum.
+
+    INPUT
+    ------
+    data  : array-like, required
+            input data
+
+    range : array-like, required
+            distribution is computed over [range[0],range[1]]
+
+    npts  : integer, optional
+            number of support points for F(x)
+    '''
+    assert range[0] < range[1]
+    support = linspace(range[0],range[1],npts)
+    cdist = zeros(npts)
+    # sort the data
+    x = sort(data)
+    # now compute F(x)
+    for i in xrange(0,len(support)):
+        cdist[i] = sum(x <= support[i])
+    return cdist/cdist.sum()
