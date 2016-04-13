@@ -244,7 +244,7 @@ def discrete_frequency_calculator(intList):
     return asarray([freq.keys()[x] for x in indx]),asarray([freq.values()[x] for x in indx])
 
 
-def cumulative_distribution(data,range,npts=1024):
+def cumulative_distribution(data):
     '''
     Computes the (empirical) cumulative distribution F(x) of samples in data, over
     a specified range and number of support points. F(x) is defined as:
@@ -257,19 +257,9 @@ def cumulative_distribution(data,range,npts=1024):
     ------
     data  : array-like, required
             input data
-
-    range : array-like, required
-            distribution is computed over [range[0],range[1]]
-
-    npts  : integer, optional
-            number of support points for F(x)
     '''
-    assert range[0] < range[1]
-    support = linspace(range[0],range[1],npts)
-    cdist = zeros(npts)
-    # sort the data
-    x = sort(data)
-    # now compute F(x)
-    for i in xrange(0,len(support)):
-        cdist[i] = sum(x <= support[i])
-    return cdist/cdist.sum()
+    # sort the data:
+    data_sorted = sort(data)
+    # calculate the proportional values of samples
+    p = 1. * arange(len(data)) / (len(data) - 1)
+    return p
