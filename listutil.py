@@ -61,7 +61,7 @@ def sort_by_value(D,reverse=False):
 
 def string_shift(s,n):
     """
-    Circularly shifts the input string s by n positions.  n > 0 will do a
-    shift to the left, and n < 0 to the right.
+    Circularly shifts the input string or list s by n positions.  n > 0 will do
+    a shift to the left, and n < 0 to the right.
     """
     return s[n:]+s[:n]
