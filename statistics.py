@@ -304,7 +304,7 @@ def cdist_dense(data,limits,npts=1024):
     # sort the data
     data_sorted = sort(data)
     x = linspace(limits[0],limits[1],npts)
-    Fofx = zeros(len(data))
+    Fofx = zeros(len(x))
     for i in xrange(0,len(x)):
         Fofx[i] = sum(data_sorted <= x[i])
     return x,1.0*Fofx/len(x)
