@@ -244,7 +244,36 @@ def discrete_frequency_calculator(intList):
     return asarray([freq.keys()[x] for x in indx]),asarray([freq.values()[x] for x in indx])
 
 
-def cumulative_distribution(data):
+def cdist_sparse(data):
+    '''
+    Computes the (empirical) cumulative distribution F(x) of data, defined as:
+
+                F(x) = int_a^b p(x) dx
+
+    or as a sum.  This function only computes F(x) at the data values; to
+    get a "stairstep" plot of the cdf use cdist_dense.
+
+    INPUT
+    ------
+    data  : array-like, required
+            input data
+
+    OUTPUT
+    ------
+    dsort : array
+            sorted data (increasing)
+
+    cdf : array
+          cdf, evaluated at the values in dsort
+    '''
+    # sort the data
+    data_sorted = sort(data)
+    # calculate the proportional values of samples
+    p = 1. * arange(len(data)) / (len(data) - 1)
+    return data_sorted,p
+
+
+def cdist_dense(data,limits,npts=1024):
     '''
     Computes the (empirical) cumulative distribution F(x) of samples in data, over
     a specified range and number of support points. F(x) is defined as:
@@ -255,11 +284,27 @@ def cumulative_distribution(data):
 
     INPUT
     ------
-    data  : array-like, required
-            input data
+    data   : array-like, required
+             input data
+
+    limits : array-like, required
+             cdf is computed for npts values between limits[0] and limits[1]
+
+    npts   : int, optional
+             number of support points to evaluate cdf
+
+    OUTPUT
+    ------
+    x : array
+        support for the cdf
+
+    cdf : array
+          cdf, evaluated at the values x
     '''
-    # sort the data:
+    # sort the data
     data_sorted = sort(data)
-    # calculate the proportional values of samples
-    p = 1. * arange(len(data)) / (len(data) - 1)
-    return p
+    x = linspace(limits[0],limits[1],npts)
+    Fofx = zeros(len(data))
+    for i in xrange(0,len(x)):
+        Fofx = sum(data_sorted <= x)
+    return x,1.0*Fofx/len(x)
