@@ -59,7 +59,8 @@ def sort_by_value(D,reverse=False):
     """
     return sorted(D.iteritems(),key=operator.itemgetter(1),reverse=reverse)
 
-def string_shift(s,n):
+
+def circshift(s,n):
     """
     Circularly shifts the input string or list s by n positions.  n > 0 will do
     a shift to the left, and n < 0 to the right.
