@@ -244,7 +244,7 @@ def discrete_frequency_calculator(intList):
     return asarray([freq.keys()[x] for x in indx]),asarray([freq.values()[x] for x in indx])
 
 
-def cdist_sparse(data):
+def cdf_sparse(data):
     '''
     Computes the (empirical) cumulative distribution F(x) of data, defined as:
 
@@ -273,7 +273,7 @@ def cdist_sparse(data):
     return data_sorted,p
 
 
-def cdist_dense(data,limits,npts=1024):
+def cdf_dense(data,limits,npts=1024):
     '''
     Computes the (empirical) cumulative distribution F(x) of samples in data, over
     a specified range and number of support points. F(x) is defined as:
