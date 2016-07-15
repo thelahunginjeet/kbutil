@@ -30,11 +30,64 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from numpy import arange,correlate,newaxis,dot,sort,int,floor
-from numpy import ceil,interp,isnan,ones,asarray,argsort,zeros,linspace
-from numpy import hanning,hamming,bartlett,blackman,r_,convolve
+from numpy import arange,correlate,newaxis,dot,sort,int,floor,log2,sqrt,abs
+from numpy import ceil,interp,isnan,ones,asarray,argsort,zeros,linspace,power
+from numpy import hanning,hamming,bartlett,blackman,r_,convolve,percentile
 from numpy.random import randint
-from scipy.stats import pearsonr,spearmanr,kendalltau
+from scipy.stats import pearsonr,spearmanr,kendalltau,skew
+
+def iqr(x):
+    """
+    Computes the interquartile range of x.
+    """
+    q75,q25 = percentile(x,[75,25])
+    return q75 - q25
+
+
+def bin_calculator(x,method='sturges'):
+    """
+    Estimates the 'appropriate' number of bins for histograms of x, using a
+    variety of rules in the literature. For methods which calculate the bin width,
+    the number of bins can be computed via k = ceil((max(x) - min(x))/h).
+    Supported methods (with N = len(x)) are:
+
+    'sturges' : k = ceil(log2(N)) + 1
+
+    'sqrt' : k = ceil(sqrt(N))
+
+    'rice' : k = ceil(2*N^(1/3))
+
+    'doane' : k = 1 + ceil(log2(N) + log2(1 + |s|/sigma_s))
+        here s = skew(x), and sigma_s = sqrt(6*(N-1)/(N+1)(N+3))
+
+    'scott' : h = 3.5*sigma/N^(1/3)
+        here sigma is the sample standard deviation
+
+    'fd' (Freedman-Diaconis) : h = 2*IQR(x)/N^(1/3)
+
+    In all cases, this function returns the number of bins for x.
+    """
+    N = len(x)
+    if method is 'sturges':
+        return ceil(log2(N)) + 1
+    elif method is 'sqrt':
+        return ceil(sqrt(N))
+    elif method is 'rice':
+        return ceil(2*power(N,1./3.))
+    elif method is 'doane':
+        s = skew(x)
+        sigma_s = sqrt((6*(N-1))/((N+1)*(N+3)))
+        return 1 + ceil(log2(N) + log2(1 + abs(s)/sigma_s))
+    elif method is 'scott':
+        h = 3.5*x.std()/power(N,1./3.)
+        return ceil((max(x) - min(x))/h)
+    elif method is 'fd':
+        h = 2*iqr(x)/power(N,1./3.)
+        return ceil((max(x) - min(x))/h)
+    else:
+        print('ERROR: Unsupported method.')
+    return
+
 
 def spearman_footrule_distance(s,t):
     """
