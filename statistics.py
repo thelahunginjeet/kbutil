@@ -36,6 +36,7 @@ from numpy import hanning,hamming,bartlett,blackman,r_,convolve,percentile
 from numpy.random import randint
 from scipy.stats import pearsonr,spearmanr,kendalltau,skew
 
+
 def iqr(x):
     """
     Computes the interquartile range of x.
@@ -65,28 +66,30 @@ def bin_calculator(x,method='sturges'):
 
     'fd' (Freedman-Diaconis) : h = 2*IQR(x)/N^(1/3)
 
-    In all cases, this function returns the number of bins for x.
+    In all cases, this function returns the number of bins for x.  Unsupported
+    methods default to sturges.
     """
     N = len(x)
     if method is 'sturges':
-        return ceil(log2(N)) + 1
+        k = ceil(log2(N)) + 1
     elif method is 'sqrt':
-        return ceil(sqrt(N))
+        k = ceil(sqrt(N))
     elif method is 'rice':
-        return ceil(2*power(N,1./3.))
+        k = ceil(2*power(N,1./3.))
     elif method is 'doane':
         s = skew(x)
-        sigma_s = sqrt((6*(N-1))/((N+1)*(N+3)))
-        return 1 + ceil(log2(N) + log2(1 + abs(s)/sigma_s))
+        sigma_s = sqrt((6.*(N-1))/((N+1)*(N+3)))
+        k = ceil(1 + log2(N) + log2(1 + abs(s)/sigma_s))
     elif method is 'scott':
         h = 3.5*x.std()/power(N,1./3.)
-        return ceil((max(x) - min(x))/h)
+        k = ceil((max(x) - min(x))/h)
     elif method is 'fd':
         h = 2*iqr(x)/power(N,1./3.)
-        return ceil((max(x) - min(x))/h)
+        k = ceil((max(x) - min(x))/h)
     else:
-        print('ERROR: Unsupported method.')
-    return
+        print('ERROR: Unsupported method.  Defaulting to \'sturges\'')
+        k = ceil(log2(N)) + 1
+    return int(k)
 
 
 def spearman_footrule_distance(s,t):
