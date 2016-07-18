@@ -30,11 +30,13 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from numpy import arange,correlate,newaxis,dot,sort,int,floor,log2,sqrt,abs
+from numpy import arange,correlate,newaxis,dot,sort,int,floor,log2,sqrt,abs,log
 from numpy import ceil,interp,isnan,ones,asarray,argsort,zeros,linspace,power
 from numpy import hanning,hamming,bartlett,blackman,r_,convolve,percentile
+from numpy import histogram,argmin,argmax
 from numpy.random import randint
 from scipy.stats import pearsonr,spearmanr,kendalltau,skew
+from scipy.special import gammaln
 
 
 def iqr(x):
@@ -66,8 +68,18 @@ def bin_calculator(x,method='sturges'):
 
     'fd' (Freedman-Diaconis) : h = 2*IQR(x)/N^(1/3)
 
-    In all cases, this function returns the number of bins for x.  Unsupported
-    methods default to sturges.
+    'meansq' : computes the optimal bin width (due to Stone) via minimization of
+        mean squared error of the density estimate.  Numerically computes:
+                        argmin_h J(h,x)
+        where J(h,x) = {2/(h*(n-1)) - (n+1)/(n^2(n-1)h) sum_k N_k^2}.
+        where N_k^2 is the square of the number of samples in bin k.  This
+        function is extremely noisy so a brute force search is performed.
+
+    'bayes' : maximizes the log posterior of a piecewise constant model (following
+        Knuth)
+
+    In all cases, this function returns the number of bins to use for the data
+    in x.  Unsupported methods default to sturges.
     """
     N = len(x)
     if method is 'sturges':
@@ -86,6 +98,28 @@ def bin_calculator(x,method='sturges'):
     elif method is 'fd':
         h = 2*iqr(x)/power(N,1./3.)
         k = ceil((max(x) - min(x))/h)
+    elif method is 'meansq':
+        # define a function that computes J
+        def J(h,x):
+            N = len(x)
+            k = ceil((max(x) - min(x))/h)
+            Nk,_ = histogram(x,bins=k)
+            return 2./(h*(N-1.)) - ((N+1.)/(h*(N-1.)*N**2))*(Nk**2).sum()
+        # do a brute force search in h
+        hmax = (max(x) - min(x))/5
+        htry = linspace(0.01,hmax,256)
+        jofh = zeros(len(htry))
+        for i in xrange(len(htry)):
+            jofh[i] = J(htry[i],x)
+        hopt = htry[argmin(jofh)]
+        k = ceil((max(x) - min(x))/hopt)
+    elif method is 'bayes':
+        maxk = 100
+        logp = zeros(maxk)
+        for M in xrange(1,maxk+1):
+            Nk,_ = histogram(x,bins=M)
+            logp[M-1] = N*log(M) + gammaln(M/2.) - gammaln(N+M/2.) - M*gammaln(1./2.) + gammaln(Nk + 0.5).sum()
+        k = argmax(logp) + 1
     else:
         print('ERROR: Unsupported method.  Defaulting to \'sturges\'')
         k = ceil(log2(N)) + 1
