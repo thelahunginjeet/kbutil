@@ -78,7 +78,7 @@ def bin_calculator(x,method='sturges'):
     'bayes' : maximizes the log posterior of a piecewise constant model
         (following Knuth arXiv:physics/0605197v2); performs brute search in the
         range 1 to 100 bins.
-        
+
     In all cases, this function returns the number of bins to use for the data
     in x.  Unsupported methods default to sturges.
     """
