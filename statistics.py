@@ -72,12 +72,13 @@ def bin_calculator(x,method='sturges'):
         mean squared error of the density estimate.  Numerically computes:
                         argmin_h J(h,x)
         where J(h,x) = {2/(h*(n-1)) - (n+1)/(n^2(n-1)h) sum_k N_k^2}.
-        where N_k^2 is the square of the number of samples in bin k.  This
-        function is extremely noisy so a brute force search is performed.
+        N_k is the number of samples in bin k.  This function is extremely noisy
+        so a brute force search is performed.
 
-    'bayes' : maximizes the log posterior of a piecewise constant model (following
-        Knuth)
-
+    'bayes' : maximizes the log posterior of a piecewise constant model
+        (following Knuth arXiv:physics/0605197v2); performs brute search in the
+        range 1 to 100 bins.
+        
     In all cases, this function returns the number of bins to use for the data
     in x.  Unsupported methods default to sturges.
     """
