@@ -232,7 +232,7 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9,ax=None):
     return ax
 
 
-def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,ylim=None):
+def plot_scatter_plus_marginals(x,y,sColor='k',xColor='k',yColor='k',xlim=None,ylim=None):
     """
     Makes a scatter plot of 2D data along with marginal densities in each coordinate, drawn
     using kernel density estimates.
@@ -280,7 +280,7 @@ def plot_scatter_plus_marginals(x,y,sColor='k',xColor='c',yColor='m',xlim=None,y
 
     # scatter plot
     axMain = pylab.axes(mainCoords,frameon=False)
-    axMain.plot(x,y,sColor+'o',mec=sColor,alpha=0.5)
+    axMain.scatter(x,y,c=sColor,marker='o',alpha=0.5)
     axMain.set_xlim(xlim)
     axMain.set_ylim(ylim)
     axMain.get_xaxis().set_visible(False)
