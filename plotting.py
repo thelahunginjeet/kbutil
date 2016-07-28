@@ -66,7 +66,7 @@ def color_wheel(colors=_colors,symbols=_symbols,lines=_lines):
 
 
 
-def pylab_pretty_plot(lines=2,width=3,size=4,labelsize=16,markersize=10,fontsize=18,usetex=True):
+def pylab_pretty_plot(lines=2,width=3,size=4,labelsize=16,markersize=10,fontsize=18,llines=2,lfontsize=16,usetex=True):
     """
     Changes pylab plot defaults to get nicer plots - frame size, marker size, etc.
 
@@ -99,6 +99,9 @@ def pylab_pretty_plot(lines=2,width=3,size=4,labelsize=16,markersize=10,fontsize
     pylab.rc("legend",fontsize=18)
     pylab.rc("text",usetex=usetex)
     pylab.rc("font",size=18)
+    pylab.rc("legend",linewidth=llines)
+    pylab.rc("legend",fontsize=lfontsize)
+    
 
 def plot_pylab_colormaps():
     """
