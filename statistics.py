@@ -35,6 +35,7 @@ from numpy import ceil,interp,isnan,ones,asarray,argsort,zeros,linspace,power
 from numpy import hanning,hamming,bartlett,blackman,r_,convolve,percentile
 from numpy import histogram,argmin,argmax
 from numpy.random import randint
+from numpy.linalg import svd
 from scipy.stats import pearsonr,spearmanr,kendalltau,skew
 from scipy.special import gammaln
 
@@ -173,7 +174,7 @@ def autocovariance(X,norm=False):
     return phi
 
 
-def corrmatrix(X,Y):
+def cross_corrmatrix(X,Y):
     """
     For two data matrices X (M x T) and Y (N x T), corrmatrix(X,Y) computes the M x N set
     of pearson correlation coefficients between all the rows of X and the rows of Y.  X and
@@ -184,6 +185,21 @@ def corrmatrix(X,Y):
     X = (X - X.mean(axis=1)[:,newaxis])/X.std(axis=1)[:,newaxis]
     Y = (Y - Y.mean(axis=1)[:,newaxis])/Y.std(axis=1)[:,newaxis]
     return dot(X,Y.T)/X.shape[1]
+
+def covmatrix(X):
+    '''
+    Computes the N x N covariance matrix for an N x p data matrix X.
+    '''
+    cX = X - X.mean(axis=1)[:,newaxis]
+    return dot(cX,cX.T)/(cX.shape[0] - 1)
+
+
+def corrmatrix(X):
+    '''
+    Computes the N x N correlation matrix for an N x p data matrix X.
+    '''
+    sX = (X - X.mean(axis=1)[:,newaxis])/X.std(axis=1)[:,newaxis]
+    return dot(sX,sX.T)/(sX.shape[0] - 1)
 
 
 def empirical_ci(x,alpha=0.05):
@@ -399,3 +415,27 @@ def cdf_dense(data,limits,npts=1024):
     for i in xrange(0,len(x)):
         Fofx[i] = sum(data_sorted <= x[i])
     return x,1.0*Fofx/len(data)
+
+
+def pca(X,k):
+    '''
+    PCA decomposition of matrix X.  X is assumed to be N x p, where p is the
+    number of samples (backwards from many PCA implementations).  If you want
+    the p x N version, just transpose what comes out of this function.
+
+    k is the number of components to retain  (probably determined by some PCA stopping rule).
+
+    Returns the matrix of eigenvectors of X (the "mixing matrix") and the "signals"
+    (projection of the data onto the first k components).
+    '''
+    # row center the data matrix
+    cX = X - X.mean(axis=1)[:,newaxis]
+    C = covmatrix(cX)
+    # singular value decomp
+    _,s,W = svd(C)
+    # select first k columns
+    W = W[:,:k]
+    # compute signal matrix
+    S = dot(W.T,X)
+    # need to do something about the units
+    return W,S
