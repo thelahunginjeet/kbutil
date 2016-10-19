@@ -142,7 +142,12 @@ def spearman_footrule_distance(s,t):
     """
     # check that size of intersection = size of s,t?
     assert len(s) == len(t)
-    return (2.0/len(s)**2)*sum(abs(asarray(s) - asarray(t)))
+    sdist = sum(abs(asarray(s) - asarray(t)))
+    if len(s) % 2 == 0:
+        normalizer = 0.5*len(s)**2
+    else:
+        normalizer = 0.5*(len(s)+1)*(len(s)-1)
+    return sdist/normalizer
 
 
 def standardize(X,stype='row'):
