@@ -143,10 +143,9 @@ def spearman_footrule_distance(s,t):
     # check that size of intersection = size of s,t?
     assert len(s) == len(t)
     sdist = sum(abs(asarray(s) - asarray(t)))
-    if len(s) % 2 == 0:
-        normalizer = 0.5*len(s)**2
-    else:
-        normalizer = 0.5*(len(s)+1)*(len(s)-1)
+    # c will be 1 for odd length lists and 0 for even ones
+    c = len(s) % 2
+    normalizer = 0.5*(len(s)**2 - c)
     return sdist/normalizer
 
 
