@@ -66,7 +66,7 @@ def color_wheel(colors=_colors,symbols=_symbols,lines=_lines):
 
 
 
-def pylab_pretty_plot(lines=2,width=3,size=4,labelsize=16,markersize=10,fontsize=18,lfontsize=16,lframeon=False,usetex=True):
+def pylab_pretty_plot(lines=2,width=3,size=4,labelsize=16,markersize=10,fontsize=20,lfontsize=16,lframeon=False,usetex=True):
     """
     Changes pylab plot defaults to get nicer plots - frame size, marker size, etc.
 
@@ -75,13 +75,13 @@ def pylab_pretty_plot(lines=2,width=3,size=4,labelsize=16,markersize=10,fontsize
     lines      : linewidth
     width      : width of framelines and tickmarks
     size       : tick mark length
-    labelsize  : size of ticklabels
+    labelsize  : font size of ticklabels
     markersize : size of plotting markers
-    fontsize   : size of font for labels and legend
+    fontsize   : size of font for axes labels
+    lfontsize  : legend fontsize
     usetex     : use latex for labels/text?
 
     """
-
     pylab.rc("lines",linewidth=lines)
     pylab.rc("lines",markeredgewidth=size/3)
     pylab.rc("lines",markersize=markersize)
@@ -97,7 +97,7 @@ def pylab_pretty_plot(lines=2,width=3,size=4,labelsize=16,markersize=10,fontsize
     pylab.rc("xtick.minor",size=size)
     pylab.rc("axes",linewidth=width)
     pylab.rc("text",usetex=usetex)
-    pylab.rc("font",size=18)
+    pylab.rc("font",size=fontsize)
     pylab.rc("legend",fontsize=lfontsize)
     pylab.rc("legend",frameon=lframeon)
 
