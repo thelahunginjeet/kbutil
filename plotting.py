@@ -178,7 +178,7 @@ def plot_hist(x,nbins=None,kde=False,color='k',ax=None):
     return ax
 
 
-def plot_points_plus_kde(xlist,markx=False,lines=3,size=9,ax=None):
+def plot_points_plus_kde(xlist,labels,markx=False,lines=3,size=9,ax=None):
     """
     Accepts a list of one-dimensional densities and plots each as points on a line
     with a KDE on top.
@@ -187,14 +187,21 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9,ax=None):
     -------------
     xlist : list of array-like objects
             data to produce density plot for
+
+    labels : list of legend labels; len(labels) should equal len(xlist)
+
     markx : bool, optional
             put tick labels at the min/max values in x?
+
     lines : integer, optional
             line/marker edge thickness
+
     size  : integer, optional
             marker size
+
     color : string, optional
             color for points and kde
+
     ax    : pylab axes object, optional
     """
     if ax is None:
@@ -216,7 +223,7 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9,ax=None):
         rpoint = max(xlist[i]) + 0.025*abs(max(xlist[i]))
         support = linspace(lpoint,rpoint,512)
         mPDF = kde(support)
-        ax.plot(support,mPDF,color=c,lw=lines)
+        ax.plot(support,mPDF,color=c,lw=lines,label=labels[i])
 
     # prtty things up
     ax.get_yaxis().set_visible(False)
@@ -230,6 +237,8 @@ def plot_points_plus_kde(xlist,markx=False,lines=3,size=9,ax=None):
         ax.get_xaxis().set_ticks([minx,maxx])
     else:
         ax.get_xaxis().set_ticks([])
+    # legend
+    ax.legend(loc='best')
 
     return ax
 
