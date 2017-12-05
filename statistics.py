@@ -255,7 +255,7 @@ def bootstrap_correlation(x,y,cType='pearson',p=0.05,N=5000):
         corr = corrTable[cType]
     except KeyError:
         # default to pearson
-        print 'WARNING: Correlation type not supported. Defaulting to Pearson.'
+        print('WARNING: Correlation type not supported. Defaulting to Pearson.')
         corr = pearsonr
     rho = corr(x,y)[0]
     rhobs = list()
@@ -305,9 +305,9 @@ def smooth(x,wlen=11,window='flat'):
     Stolen from the scipy cookbook and modified.
     """
     if x.ndim != 1:
-        raise ValueError, "smooth only accepts 1 dimension arrays."
+        raise ValueError("smooth only accepts 1 dimension arrays.")
     if x.size < wlen:
-        raise ValueError, "Input vector needs to be bigger than window size."
+        raise ValueError("Input vector needs to be bigger than window size.")
     if wlen < 3:
         return x
     # dictionary of allowed windows
@@ -316,7 +316,7 @@ def smooth(x,wlen=11,window='flat'):
         w = winTable[window]
     except KeyError:
         # default to flat
-        print 'WARINING: Unsupported window type. Defaulting to \'flat\'.'
+        print('WARINING: Unsupported window type. Defaulting to \'flat\'.')
         w = winTable['flat']
     w = w(wlen)
     # wrap ends around and convolve with the scaled window
@@ -349,7 +349,7 @@ def discrete_frequency_calculator(intList):
     n = len(intList)
     for k in intList:
         pkinc = 1.0/n
-        if not freq.has_key(k):
+        if k not in freq:
             freq[k] = pkinc
         else:
             freq[k] += pkinc
