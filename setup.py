@@ -16,7 +16,7 @@ class PyTest(Command):
 """
 
 setup(name='kbutil',
-      version='1.1',
+      version='1.1.1',
       description='Python utility functions',
       author='Kevin Brown',
       author_email='kevin.s.brown@uconn.edu',

@@ -111,14 +111,14 @@ def bin_calculator(x,method='sturges'):
         hmax = (max(x) - min(x))/5
         htry = linspace(0.01,hmax,256)
         jofh = zeros(len(htry))
-        for i in xrange(len(htry)):
+        for i in range(len(htry)):
             jofh[i] = J(htry[i],x)
         hopt = htry[argmin(jofh)]
         k = ceil((max(x) - min(x))/hopt)
     elif method is 'bayes':
         maxk = 100
         logp = zeros(maxk)
-        for M in xrange(1,maxk+1):
+        for M in range(1,maxk+1):
             Nk,_ = histogram(x,bins=M)
             logp[M-1] = N*log(M) + gammaln(M/2.) - gammaln(N+M/2.) - M*gammaln(1./2.) + gammaln(Nk + 0.5).sum()
         k = argmax(logp) + 1
@@ -419,7 +419,7 @@ def cdf_dense(data,limits,npts=1024):
     data_sorted = sort(data)
     x = linspace(limits[0],limits[1],npts)
     Fofx = zeros(len(x))
-    for i in xrange(0,len(x)):
+    for i in range(0,len(x)):
         Fofx[i] = sum(data_sorted <= x[i])
     return x,1.0*Fofx/len(data)
 
