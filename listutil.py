@@ -56,9 +56,10 @@ def flatten(l):
 def sort_by_value(D,reverse=False):
     """
     There are many ways to sort a dictionary by value and return lists/tuples/etc.
-    This is one recommended in PEP265.
+    This is recommended for python 3 on StackOverflow.
     """
-    return sorted(D.iteritems(),key=operator.itemgetter(1),reverse=reverse)
+    return [(k,D[k]) for k in sorted(D,key=D.get,reverse=reverse)]
+
 
 
 def circshift(s,n):

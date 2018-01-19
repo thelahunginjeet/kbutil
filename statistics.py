@@ -354,7 +354,7 @@ def discrete_frequency_calculator(intList):
         else:
             freq[k] += pkinc
     # sorting
-    indx = argsort(freq.keys())
+    indx = argsort(list(freq.keys()))
     return asarray([freq.keys()[x] for x in indx]),asarray([freq.values()[x] for x in indx])
 
 
