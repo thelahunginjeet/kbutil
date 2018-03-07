@@ -224,7 +224,7 @@ def empirical_ci(x,alpha=0.05):
     u1 = int(floor(xu))
     u2 = int(ceil(xu))
     lb = interp(xl,[l1,l2],[xtilde[l1],xtilde[l2]])
-    up = interp(xu,[u1,u2],[xtilde[u1],xtilde[u2]])
+    ub = interp(xu,[u1,u2],[xtilde[u1],xtilde[u2]])
     return lb,ub
 
 
