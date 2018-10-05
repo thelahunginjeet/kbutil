@@ -128,6 +128,30 @@ def plot_pylab_colormaps():
     return fig
 
 
+def plot_points_plus_bounds(x,y,yl,yu,xl=None,xu=None,ax=None,color='k',marker='o',label=None):
+    """
+    Plots the points x and y along with vertical lines for y and optional
+    horizontal lines for x incoporating the bounds.  Can be used as a
+    stripped down boxplot, or to make errorbars without caps.
+    """
+    if ax is None:
+        ax = pylab.axes()
+
+    # plot y vs x
+    ax.plot(x,y,color=color,marker=marker,label=label)
+
+    # now plot the vertical bound lines
+    for i in range(len(y)):
+        ax.plot([x[i],x[i]],[yl[i],yu[i]],color=color,linestyle='-')
+
+    # horizontal bound lines if not none
+    if xl is not None:
+        for i in range(len(x)):
+            ax.plot([xl[i],xu[i]],[y[i],y[i]],color=color,linestyle='-')
+
+    return ax
+
+
 def plot_hist(x,nbins=None,kde=False,color='k',ax=None):
     """
     Plots a histogram (bar plot) of the data in x, with an optional kernel
