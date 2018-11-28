@@ -39,9 +39,12 @@ from scipy.stats import gaussian_kde
 from matplotlib.ticker import FuncFormatter
 from matplotlib import colors
 
-_colors = ('k','r','orange','gold','g','b','purple','magenta',
-           'firebrick','coral','yellow','limegreen','dodgerblue','indigo','orchid',
-           'tomato','darkorange','greenyellow','darkgreen','deepskyblue','indigo','deeppink')
+#_colors = ('k','r','orange','gold','g','b','purple','magenta',
+#           'firebrick','coral','limegreen','dodgerblue','indigo','orchid',
+#           'tomato','darkorange','greenyellow','darkgreen','yellow','deepskyblue','indigo','deeppink')
+_colors = ('#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0',
+            '#f032e6', '#bcf60c','#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8',
+            '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000')
 _symbols = ('o','s','^','<','>','x','D','h','p')
 _lines = ('-','--','-.',':')
 
