@@ -162,7 +162,7 @@ def standardize(X,stype='row'):
     return (X - X.mean(axis=0)[newaxis,:])/X.std(axis=0)[newaxis,:]
 
 
-def autocovariance(X,norm=False):
+def autocovariance(X,norm=False,samp_corr=True):
     """
     Computes the autocovariance function of X:
         phi(T) = 1/(N-T) sum_i X'(t_i)*X'(t_i - T)
@@ -173,9 +173,17 @@ def autocovariance(X,norm=False):
 
     If norm = True, the autocorrelation (phi(T)/phi(0)), rather than the
     bare autocovariance is returned.
+
+    If samp_corr = True, a proper sample size correction is performed in which
+    each element of C(tau) is divided by len(X) - tau.  If False, just divide
+    everything by len(X)
     """
     Xp = X - X.mean()
-    phi = (1.0/(len(X) - arange(0,len(X))))*correlate(Xp,Xp,"full")[len(X)-1:]
+    phi = correlate(Xp,Xp,"full")[len(X)-1:]
+    if samp_corr:
+        phi = (1.0/(len(X) - arange(0,len(X))))*phi
+    else:
+        phi = (1.0/len(X))*phi
     if norm:
         return phi/phi[0]
     return phi
