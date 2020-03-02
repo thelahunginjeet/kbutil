@@ -30,12 +30,12 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from numpy import arange,correlate,newaxis,dot,sort,int,floor,log2,sqrt,abs,log
-from numpy import ceil,interp,isnan,ones,asarray,argsort,zeros,linspace,power
-from numpy import hanning,hamming,bartlett,blackman,r_,convolve,percentile
-from numpy import histogram,argmin,argmax
+from numpy import arange,correlate,newaxis,dot,sort,int,floor,log2,sqrt,abs,log,float,bool
+from numpy import ceil,interp,isnan,ones,asarray,argsort,zeros,linspace,power,ones,eye,mean
+from numpy import hanning,hamming,bartlett,blackman,r_,convolve,percentile,corrcoef
+from numpy import histogram,argmin,argmax,asarray,triu,diag
 from numpy.random import randint
-from numpy.linalg import svd
+from numpy.linalg import svd,lstsq,pinv,cholesky
 from scipy.stats import pearsonr,spearmanr,kendalltau,skew
 from scipy.special import gammaln
 
@@ -201,6 +201,7 @@ def cross_corrmatrix(X,Y):
     Y = (Y - Y.mean(axis=1)[:,newaxis])/Y.std(axis=1)[:,newaxis]
     return dot(X,Y.T)/X.shape[1]
 
+
 def covmatrix(X):
     '''
     Computes the N x N covariance matrix for an N x p data matrix X.
@@ -211,10 +212,10 @@ def covmatrix(X):
 
 def corrmatrix(X):
     '''
-    Computes the N x N correlation matrix for an N x p data matrix X.
+    Computes the N x N correlation matrix for an N x p data matrix X.  Kept in here
+    purely for backwards compatibility.
     '''
-    sX = (X - X.mean(axis=1)[:,newaxis])/X.std(axis=1)[:,newaxis]
-    return dot(sX,sX.T)/(sX.shape[0] - 1)
+    return corrcoef(X)
 
 
 def empirical_ci(x,alpha=0.05):
@@ -454,3 +455,94 @@ def pca(X,k):
     S = dot(W.T,X)
     # need to do something about the units
     return W,S
+
+
+def prior_covariance(sigma_sample,target='dense'):
+    """
+    Returns a prior covariance estimate sigma_prior, using the sample covariance matrix
+    matrix.
+
+    Allowed shrinkage targets:
+        'diagonal' : prior is diagonal, with the diagonal elements = mean(diag(sigma_sample))
+
+        'dense' : diagonal elements same as 'diagonal', with off diagonal elements equal to
+                  the average off-diagonal element in sigma_sample
+    """
+    meanS = mean(diag(sigma_sample))
+    sigma_prior = meanS*eye(sigma_sample.shape[0])
+    if target is 'dense':
+        meanCVS = 2*triu(sigma_sample).sum()/(sigma_sample.shape[0]*(sigma_sample.shape[0]-1))
+        sigma_prior = sigma_prior + meanCVS*(ones(sigma_sample.shape) - eye(sigma_sample.shape[0]))
+    return sigma_prior
+
+
+def empirical_shrinkage(sigma_sample,sigma_prior):
+    """
+    Returns a shrunken covariance matrix estimate sigmaHat, formed using:
+            sigma_hat = rho*sigma_prior + (1-rho)*sigma_sample
+    The rho parameter is empirically determined by choosing the minimum rho which makes
+    sigmaHat positive definite.
+    """
+    rho = 1.0e-02
+    mu = 1.1
+    while rho < 1.0:
+        try:
+            cholesky(rho*sigma_prior + (1.0-rho)*sigma_sample)
+            break
+        except:
+            rho = mu*rho
+    # last value of rho gives the minimum shrinkage necessary
+    return rho*sigma_prior + (1.0-rho)*sigma_sample
+
+
+def partial_corr(C,shrinkage=None):
+    """
+    Returns the sample linear partial correlation coefficients between pairs of variables in C, controlling
+    for the remaining variables in C. Uses the inverse (of the covariance/correlation) matrix method, since this
+    can also be used to compute the semi-partial correlation.
+
+    See:
+
+        http://en.wikipedia.org/wiki/Partial_correlation
+
+
+    Parameters
+    ----------
+    C : array-like, shape (n, p)
+        Array with the different variables. Each column of C is taken as a variable
+
+    shrinkage: string, optional
+        Allows you to shrink the covariance matrix if it is not positive definite due
+        to numerical instability (more variables than samples).  Options:
+            None   : no shrinkage
+            'dense': dense prior covariance estimate
+            'diagonal' : diagonal prior covariance estimate
+
+    Returns
+    -------
+    P : array-like, shape (p, p)
+        P[i, j] contains the partial correlation of C[:, i] and C[:, j] controlling
+        for the remaining variables in C.
+    """
+
+    C = asarray(C)
+    p = C.shape[1]
+    P_corr = zeros((p, p), dtype=float)
+
+    # compute covariance matrix and perform shrinkage if desired
+    sigma = covmatrix(C.T)
+    if shrinkage is not None:
+        prior_sigma = prior_covariance(sigma,shrinkage)
+        sigma = empirical_shrinkage(sigma,prior_sigma)
+
+    # now invert the (possibly) conditioned covariance matrix
+    X = pinv(sigma)
+
+    # fill in partial correlations
+    for i in range(p):
+        P_corr[i,i] = 1.0
+        for j in range(i+1,p):
+            P_corr[i,j] = -X[i,j]/sqrt(X[i,i]*X[j,j])
+            P_corr[j,i] = P_corr[i,j]
+
+    return P_corr

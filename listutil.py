@@ -30,7 +30,24 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import collections,operator
+import collections,operator,itertools
+
+def exclude_rows(X,exclude):
+    """
+    Tries to replicate the functionality of negative indices in R (i.e., X[-exclude,:]);
+    works for rows.  Returns a copy of X missing the desired rows.
+    """
+    to_keep = [x for x in range(X.shape[0]) if x not in exclude]
+    return X[to_keep,:]
+
+
+def exclude_cols(X,exclude):
+    """
+    Same as exclude_rows(), but returns X[:,-exclude].
+    """
+    to_keep = [x for x in range(X.shape[1]) if x not in exclude]
+    return X[:,to_keep]
+
 
 def unique(seq, idfun=repr):
     """
@@ -43,14 +60,9 @@ def unique(seq, idfun=repr):
 
 def flatten(l):
     """
-    Generator that flattens a list.
+    Function to flatten a list.
     """
-    for el in l:
-        if isinstance(el,collections.Iterable) and not isinstance(el,basestring):
-            for sub in flatten(el):
-                yield sub
-        else:
-            yield el
+    list(itertools.chain.from_iterable(l))
 
 
 def sort_by_value(D,reverse=False):
