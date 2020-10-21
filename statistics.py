@@ -555,5 +555,5 @@ def linear_least_squares(x,y):
     objects.
     '''
     A = vstack([x,ones(len(x))]).T
-    m,b = lstsq(A,y)[0]
+    m,b = lstsq(A,y,rcond=None)[0]
     return m,b
