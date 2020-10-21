@@ -33,7 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from numpy import arange,correlate,newaxis,dot,sort,int,floor,log2,sqrt,abs,log,float,bool
 from numpy import ceil,interp,isnan,ones,asarray,argsort,zeros,linspace,power,ones,eye,mean
 from numpy import hanning,hamming,bartlett,blackman,r_,convolve,percentile,corrcoef
-from numpy import histogram,argmin,argmax,asarray,triu,diag
+from numpy import histogram,argmin,argmax,asarray,triu,diag,vstack
 from numpy.random import randint
 from numpy.linalg import svd,lstsq,pinv,cholesky
 from scipy.stats import pearsonr,spearmanr,kendalltau,skew
@@ -546,3 +546,14 @@ def partial_corr(C,shrinkage=None):
             P_corr[j,i] = P_corr[i,j]
 
     return P_corr
+
+
+def linear_least_squares(x,y):
+    '''
+    A wrapper for numpy.linalg.lstsq because I can never remember the reshaping
+    of the predictor array to get this right.  x and y are assumed to be 1D array-like
+    objects.
+    '''
+    A = vstack([x,ones(len(x))]).T
+    m,b = lstsq(A,y)[0]
+    return m,b

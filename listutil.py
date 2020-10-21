@@ -62,7 +62,7 @@ def flatten(l):
     """
     Function to flatten a list.
     """
-    list(itertools.chain.from_iterable(l))
+    return list(itertools.chain.from_iterable(l))
 
 
 def sort_by_value(D,reverse=False):
