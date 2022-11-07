@@ -37,7 +37,9 @@ from numpy import max as mpmax
 from numpy.random import randn
 from scipy.stats import gaussian_kde
 from matplotlib.ticker import FuncFormatter
-from matplotlib import colors
+from matplotlib import colors,cm
+
+import seaborn as sns
 
 #_colors = ('k','r','orange','gold','g','b','purple','magenta',
 #           'firebrick','coral','limegreen','dodgerblue','indigo','orchid',
@@ -206,6 +208,44 @@ def plot_hist(x,nbins=None,kde=False,color='k',ax=None):
     ax.set_ylim(bottom=-0.01)
 
     return ax
+
+
+def plot_upper_tri_heatmap(matrix,xtick_labels=None,ytick_labels=None,cmap=cm.viridis,vmin=0,vmax=1):
+    '''
+    Uses seaborn to plot the upper triangle of a symmetric matrix as a heatmap.
+
+    Parameters:
+    -------------
+    matrix : array, required
+        square matrix of values to plot
+
+    xtick_labels : array-like, optional
+        list of x tick labels
+
+    ytick_labels : array-like, optional
+        list of y tick labels
+
+    cmap : matplotlib colormap, optional
+
+    vmin, vmax: float, optional
+        limits for the plot
+    """
+    '''
+    if xtick_labels is None:
+        xtick_labels = range(matrix.shape[0])
+    if ytick_labels is None:
+        ytick_labels = range(matrix.shape[1])
+    # create the mask to leave out the lower triangle
+    mask = np.zeros_like(matrix,dtype=np.bool)
+    mask[np.tril_indices_from(mask)] = True
+    mask[np.diag_indices_from(mask)] = False
+    # make the plot
+    sns_plot = sns.heatmap(matrix,mask=mask,cmap=plt.cm.cividis,vmin=vmin,vmax=vmax,square=True)
+    # tick labels
+    plt.yticks([x + 0.5 for x in range(0,len(ytick_labels))],ytick_labels,rotation=0)
+    plt.xticks([x + 0.5 for x in range(0,len(xtick_labels))],xtick_labels,rotation=90)
+    fig = sns_plot.get_figure()
+    return fig
 
 
 def plot_points_plus_kde(xlist,labels,markx=False,lines=3,size=9,ax=None):
