@@ -1,9 +1,9 @@
 """
-@author: Kevin S. Brown, University of Connecticut
+@author: Kevin S. Brown, Oregon State University
 
 This source code is provided under the BSD-3 license, duplicated as follows:
 
-Copyright (c) 2013, Kevin S. Brown
+Copyright (c) 2021, Kevin S. Brown
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -30,53 +30,38 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import collections,operator,itertools
+import numpy as np
 
-def exclude_rows(X,exclude):
-    """
-    Tries to replicate the functionality of negative indices in R (i.e., X[-exclude,:]);
-    works for rows.  Returns a copy of X missing the desired rows.
-    """
-    to_keep = [x for x in range(X.shape[0]) if x not in exclude]
-    return X[to_keep,:]
+def kabsch_umeyama(A, B):
+    '''
+    Uses the Kabsch-Umeyama algorithm (least squares minimization) to align the
+    vectors in set B with the reference set in A.  A and B should be matrices of
+    N-Dimensional vectors, where each vector is a row.
 
+    Returns the translation/rotation/scaling parameters and the tranformed B.
 
-def exclude_cols(X,exclude):
-    """
-    Same as exclude_rows(), but returns X[:,-exclude].
-    """
-    to_keep = [x for x in range(X.shape[1]) if x not in exclude]
-    return X[:,to_keep]
+    Thanks to this blog post:
 
+    https://zpl.fi/aligning-point-patterns-with-kabsch-umeyama-algorithm/
 
-def unique(seq, idfun=repr):
-    """
-    Returns a list of unique items in a sequence of items.  There are lots of ways to
-    do this; here is one.
-    """
-    seen = {}
-    return [seen.setdefault(idfun(e),e) for e in seq if idfun(e) not in seen]
+    for the code.
+    '''
+    assert A.shape == B.shape
+    n, m = A.shape
 
+    EA = np.mean(A, axis=0)
+    EB = np.mean(B, axis=0)
+    VarA = np.mean(np.linalg.norm(A - EA, axis=1) ** 2)
 
-def flatten(l):
-    """
-    Function to flatten a list.
-    """
-    return list(itertools.chain.from_iterable(l))
+    H = ((A - EA).T @ (B - EB)) / n
+    U, D, VT = np.linalg.svd(H)
+    d = np.sign(np.linalg.det(U) * np.linalg.det(VT))
+    S = np.diag([1] * (m - 1) + [d])
 
+    R = U @ S @ VT
+    c = VarA / np.trace(np.diag(D) @ S)
+    t = EA - c * R @ EB
 
-def sort_by_value(D,reverse=False):
-    """
-    There are many ways to sort a dictionary by value and return lists/tuples/etc.
-    This is recommended for python 3 on StackOverflow.
-    """
-    return [(k,D[k]) for k in sorted(D,key=D.get,reverse=reverse)]
+    B_trans = np.array([t + c * R @ b for b in B])
 
-
-
-def circshift(s,n):
-    """
-    Circularly shifts the input string or list s by n positions.  n > 0 will do
-    a shift to the left, and n < 0 to the right.
-    """
-    return s[n:]+s[:n]
+    return R, c, t, B_trans
