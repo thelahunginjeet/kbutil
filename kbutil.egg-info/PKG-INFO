@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: kbutil
+Version: 1.4.2
+Summary: Python utility functions
+Home-page: https://github.com/thelahunginjeet/kbutil
+Author: Kevin Brown
+Author-email: kevin.s.brown@uconn.edu
+License: BSD-3
+Classifier: License :: OSI Approved :: BSD-3 License
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Scientists
+Classifier: Programming Language :: Python
+License-File: LICENSE
